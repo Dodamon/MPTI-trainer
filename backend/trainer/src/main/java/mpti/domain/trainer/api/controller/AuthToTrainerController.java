@@ -27,7 +27,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/api/trainer/api/auth")
 public class AuthToTrainerController {
     private static final Logger logger = LoggerFactory.getLogger(AuthToTrainerController.class);
     private final TrainerRepository trainerRepository;
