@@ -17,6 +17,7 @@ public class TrainerController {
 
     @GetMapping("/duplication-check")
     public ResponseEntity checkDuplicateId(@RequestBody(required = true) String email) {
+
         trainerService.checkDuplicateEmail(email);
         return ResponseEntity.ok(email);
     }
