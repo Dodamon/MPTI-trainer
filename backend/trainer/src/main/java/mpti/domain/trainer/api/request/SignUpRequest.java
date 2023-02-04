@@ -22,16 +22,15 @@ public class SignUpRequest {
     @Email
     @Size(min = 3, max = 50)
     private String email;
-    private String imageUrl;
-    @Column(nullable = false)
-    private Boolean emailVerified = false;
     private String password;
     private LocalDate birthday;
-    private String provider = "local";
     private String gender;
     private String phone;
     private String awards;
     private String license;
     private String career;
+    private String imageUrl;
+//    @Column(nullable = false)
+//    private Boolean emailVerified = false;
 
 }

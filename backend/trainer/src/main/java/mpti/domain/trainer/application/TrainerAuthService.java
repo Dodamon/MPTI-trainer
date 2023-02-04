@@ -1,7 +1,8 @@
-package mpti.domain.trainer.dao;
+package mpti.domain.trainer.application;
 
 import lombok.RequiredArgsConstructor;
 import mpti.common.exception.EmailDuplicateException;
+import mpti.domain.trainer.dao.TrainerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

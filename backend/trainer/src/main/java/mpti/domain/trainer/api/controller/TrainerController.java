@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import mpti.domain.trainer.api.request.ApprovedRequest;
 import mpti.domain.trainer.api.request.SignUpRequest;
 import mpti.domain.trainer.api.request.UpdateRequest;
-import mpti.domain.trainer.api.response.ApiResponse;
 import mpti.domain.trainer.application.FileService;
-import mpti.domain.trainer.dao.TrainerService;
+import mpti.domain.trainer.application.TrainerService;
 import mpti.domain.trainer.dto.FileDto;
 import mpti.domain.trainer.dto.TrainerDto;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import mpti.domain.trainer.application.S3Service;
@@ -62,30 +61,29 @@ public class TrainerController {
         return ResponseEntity.ok("delete success");
     }
 
-//    @GetMapping("/list")
-//    public ResponseEntity getTrainerList(@PathVariable String email) {
-//        TrainerDto[] trainerDtoList =
-//        return ResponseEntity.ok("");
-//    }
+    @GetMapping("/list/{page}")
+    public ResponseEntity getTrainerListByDate(@PathVariable int page) {
+        Slice<TrainerDto> slice = trainerService.getAllTrainers(page, 5, "createAt");
+        return ResponseEntity.ok(slice);
+    }
 
-    @GetMapping("/application/list")
-    public ResponseEntity getTrainerApplicationList(@Valid @RequestBody ApprovedRequest approvedRequest) {
-        Boolean approved = approvedRequest.getApproved();
-        System.out.println(approved);
-        if(approved) {
-            trainerService.setAprroved(approvedRequest.getEmail());
-            return ResponseEntity.ok("approve success");
-        } else {
-            trainerService.deleteInfo(approvedRequest.getEmail());
-            return ResponseEntity.ok("delete success");
-        }
+    @GetMapping("/listbystar/{page}")
+    public ResponseEntity getTrainerListByStar(@PathVariable int page) {
+        Slice<TrainerDto> slice = trainerService.getAllTrainers(page, 5, "stars");
+        return ResponseEntity.ok(slice);
+    }
+
+    @GetMapping("/application/list/{page}")
+    public ResponseEntity getTrainerApplicationList(@PathVariable int page) {
+        Slice<TrainerDto> slice = trainerService.getAllNotApprovedTrainers(page, 5);
+        return ResponseEntity.ok(slice);
     }
 
     @PostMapping("/application/process")
     public ResponseEntity processTrainerApplicationList(@Valid @RequestBody ApprovedRequest approvedRequest) {
         Boolean approved = approvedRequest.getApproved();
         System.out.println(approved);
-        if(approved) {
+        if (approved) {
             trainerService.setAprroved(approvedRequest.getEmail());
             return ResponseEntity.ok("approve success");
         } else {
@@ -119,4 +117,5 @@ public class TrainerController {
 
         return ResponseEntity.ok(map);
     }
+
 }

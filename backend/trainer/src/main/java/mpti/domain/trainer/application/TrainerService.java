@@ -1,12 +1,17 @@
-package mpti.domain.trainer.dao;
+package mpti.domain.trainer.application;
 
 import lombok.RequiredArgsConstructor;
 import mpti.common.exception.EmailDuplicateException;
 import mpti.common.exception.ResourceNotFoundException;
 import mpti.domain.trainer.api.request.SignUpRequest;
 import mpti.domain.trainer.api.request.UpdateRequest;
+import mpti.domain.trainer.dao.TrainerRepository;
 import mpti.domain.trainer.dto.TrainerDto;
 import mpti.domain.trainer.entity.Trainer;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +64,6 @@ public class TrainerService {
                 .awards(trainer.getAwards())
                 .license(trainer.getLicense())
                 .career(trainer.getCareer())
-                .provider(trainer.getProvider())
                 .imageUrl(trainer.getImageUrl())
                 .build();
         return trainerDto;
@@ -111,5 +115,48 @@ public class TrainerService {
                         new ResourceNotFoundException("Email", email)
                 );
         trainer.setApproved(true);
+    }
+
+    public Slice<TrainerDto> getAllTrainers(int page, int size, String orderType) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderType));
+        Slice<Trainer> slice = trainerRepository.findSliceByApproved(true, pageRequest);
+        Slice<TrainerDto> toMap = slice.map(m
+                -> TrainerDto.builder()
+                .name(m.getName())
+                .email(m.getEmail())
+                .birthday(m.getBirthday())
+                .gender(m.getGender())
+                .phone(m.getPhone())
+                .awards(m.getAwards())
+                .license(m.getLicense())
+                .career(m.getCareer())
+                .imageUrl(m.getImageUrl())
+                .stars(m.getStars())
+                .createAt(m.getCreateAt())
+                .build()
+        );
+
+        return toMap;
+    }
+
+    public Slice<TrainerDto> getAllNotApprovedTrainers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createAt"));
+        Slice<Trainer> slice = trainerRepository.findSliceByApproved(false, pageRequest);
+        Slice<TrainerDto> toMap = slice.map(m
+                -> TrainerDto.builder()
+                .name(m.getName())
+                .email(m.getEmail())
+                .birthday(m.getBirthday())
+                .gender(m.getGender())
+                .phone(m.getPhone())
+                .awards(m.getAwards())
+                .license(m.getLicense())
+                .career(m.getCareer())
+                .imageUrl(m.getImageUrl())
+                .stars(m.getStars())
+                .createAt(m.getCreateAt())
+                .build()
+        );
+        return toMap;
     }
 }
