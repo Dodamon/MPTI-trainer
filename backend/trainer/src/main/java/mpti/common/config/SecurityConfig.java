@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .httpBasic()
                 .disable();
 
-                // 접근제한 설정
+//                // 접근제한 설정
 //                 .authorizeRequests()
 //                 .antMatchers("/",
 //                         "/error",
@@ -56,14 +56,14 @@ public class SecurityConfig {
 //                         "/**/*.css",
 //                         "/**/*.js")
 //                 .permitAll()
-//                 .antMatchers("/api/auth/**", "/api/oauth2/**")
+//                 .antMatchers("/api/auth/**")
 //                 .permitAll()
 //                 .anyRequest()
 //                 .authenticated()
 //                 .and();
-
+//
 //         // 토큰 유효성 검사 필터
-        httpSecurity.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//        httpSecurity.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

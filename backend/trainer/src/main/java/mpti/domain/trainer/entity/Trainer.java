@@ -1,17 +1,21 @@
 package mpti.domain.trainer.entity;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
+
 @Table(name = "trainer")
 public class Trainer {
 
@@ -24,11 +28,6 @@ public class Trainer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trainer_id")
     private Long id;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
-    private Address address;
-
     @Column(nullable = false)
     private String name;
     @Email
@@ -42,9 +41,21 @@ public class Trainer {
     private String providerId;
     private String gender;
     private String phone;
-    private String address2;
+    private String awards;
     private String license;
+    private String career;
     private boolean approved;
+    private LocalDate birthday;
+
+    private String title;
+    public Trainer() {
+    }
+
+    public void setTitle(String title) {
+        if(title != null) this.title = title;
+    }
+
+
     @CreatedDate
     @Column(name = "create_at")
     private LocalDateTime createAt;

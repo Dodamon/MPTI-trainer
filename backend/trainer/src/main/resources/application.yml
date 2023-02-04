@@ -31,3 +31,15 @@ app:
 
 logging.level:
   org.hibernate.SQL: debug
+
+cloud:
+  aws:
+    credentials:
+      access-key: AKIAVZLMAQJIMJXA7ZEA
+      secret-key: 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
+    s3: #버킷이름
+      bucket: i8a803.p.ssafy.io.baguni
+    region: #S3 지역
+      static: ap-northeast-2
+    stack:
+      auto: false

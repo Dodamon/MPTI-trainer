@@ -30,11 +30,12 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     public static UserPrincipal create(Trainer user) {
         List<GrantedAuthority> authorities = Collections.
                 singletonList(new SimpleGrantedAuthority("ROLE_TRAINER"));
-
         return new UserPrincipal(user.getId(), user.getEmail(), user.getPassword(), authorities);
     }
 
+    public Long getId() {return id;}
 
+    public String getEmail() {return email;}
     @Override
     public String getPassword() {
         return password;

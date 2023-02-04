@@ -11,6 +11,6 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
 
     Optional<Trainer> findByEmail(String email);
     Boolean existsByEmail(String email);
-
+    Trainer findTrainerByEmail(String email);
 
 }
