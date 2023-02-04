@@ -2,20 +2,14 @@ package mpti.domain.trainer.dao;
 
 import lombok.RequiredArgsConstructor;
 import mpti.common.exception.EmailDuplicateException;
+import mpti.common.exception.ResourceNotFoundException;
 import mpti.domain.trainer.api.request.SignUpRequest;
+import mpti.domain.trainer.api.request.UpdateRequest;
 import mpti.domain.trainer.dto.TrainerDto;
 import mpti.domain.trainer.entity.Trainer;
-import net.minidev.json.JSONArray;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.Column;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.net.UnknownHostException;
-import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -43,15 +37,79 @@ public class TrainerService {
                 trainer.setBirthday(signUpRequest.getBirthday());
                 trainer.setGender(signUpRequest.getGender());
                 trainer.setPhone(signUpRequest.getPhone());
-                trainer.setAwards(JSONArray.toJSONString(signUpRequest.getAwards()));
-                trainer.setLicense(JSONArray.toJSONString(signUpRequest.getLicense()));
-                trainer.setCareer(JSONArray.toJSONString(signUpRequest.getCareer()));
+                trainer.setAwards(signUpRequest.getAwards());
+                trainer.setLicense(signUpRequest.getLicense());
+                trainer.setCareer(signUpRequest.getCareer());
         trainerRepository.save(trainer);
     }
 
-//    public TrainerDto getInfo(String email) {
-//
-//    }
+    @Transactional(readOnly = true)
+    public TrainerDto getInfo(String email) {
+        Trainer trainer = trainerRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Email", email)
+                );
 
+        TrainerDto trainerDto = TrainerDto.builder()
+                .name(trainer.getName())
+                .email(trainer.getEmail())
+                .birthday(trainer.getBirthday())
+                .gender(trainer.getGender())
+                .phone(trainer.getPhone())
+                .awards(trainer.getAwards())
+                .license(trainer.getLicense())
+                .career(trainer.getCareer())
+                .provider(trainer.getProvider())
+                .imageUrl(trainer.getImageUrl())
+                .build();
+        return trainerDto;
+    }
 
+    @Transactional
+    public TrainerDto updateInfo(String email, UpdateRequest updateRequest) {
+        Trainer trainer = trainerRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Email", email)
+                );
+
+        String name = updateRequest.getName();
+        String phone = updateRequest.getPhone();
+        String gender = updateRequest.getGender();
+        String imageUrl = updateRequest.getImageUrl();
+
+        if(name != null) trainer.setName(name);
+        if(phone != null) trainer.setPhone(phone);
+        if(gender != null) trainer.setGender(gender);
+        if(imageUrl != null) trainer.setImageUrl(imageUrl);
+
+        return getInfo(email);
+    }
+
+    @Transactional
+    public void deleteInfo(String email) {
+        Trainer trainer = trainerRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Email", email)
+                );
+
+        trainerRepository.delete(trainer);
+    }
+
+    @Transactional(readOnly = true)
+    public String getName(Long id) {
+        Trainer trainer = trainerRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Id", id)
+                );
+        return trainer.getName();
+    }
+
+    @Transactional
+    public void setAprroved(String email) {
+        Trainer trainer = trainerRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Email", email)
+                );
+        trainer.setApproved(true);
+    }
 }

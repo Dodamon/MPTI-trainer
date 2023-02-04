@@ -30,8 +30,8 @@ public class SignUpRequest {
     private String provider = "local";
     private String gender;
     private String phone;
-    private ArrayList<String> awards;
-    private ArrayList<String> license;
-    private ArrayList<String> career;
+    private String awards;
+    private String license;
+    private String career;
 
 }

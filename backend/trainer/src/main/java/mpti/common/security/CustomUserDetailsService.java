@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(Long id) {
         Trainer user = trainerRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", id)
+                () -> new ResourceNotFoundException("id", id)
         );
         return UserPrincipal.create(user);
     }
