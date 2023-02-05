@@ -8,6 +8,7 @@ import mpti.domain.trainer.application.FileService;
 import mpti.domain.trainer.application.TrainerService;
 import mpti.domain.trainer.dto.FileDto;
 import mpti.domain.trainer.dto.TrainerDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,20 +64,20 @@ public class TrainerController {
 
     @GetMapping("/list/{page}")
     public ResponseEntity getTrainerListByDate(@PathVariable int page) {
-        Slice<TrainerDto> slice = trainerService.getAllTrainers(page, 5, "createAt");
-        return ResponseEntity.ok(slice);
+        Page<TrainerDto> pages = trainerService.getAllTrainers(page, 5, "createAt");
+        return ResponseEntity.ok(pages);
     }
 
     @GetMapping("/listbystar/{page}")
     public ResponseEntity getTrainerListByStar(@PathVariable int page) {
-        Slice<TrainerDto> slice = trainerService.getAllTrainers(page, 5, "stars");
-        return ResponseEntity.ok(slice);
+        Page<TrainerDto> pages = trainerService.getAllTrainers(page, 5, "stars");
+        return ResponseEntity.ok(pages);
     }
 
     @GetMapping("/application/list/{page}")
     public ResponseEntity getTrainerApplicationList(@PathVariable int page) {
-        Slice<TrainerDto> slice = trainerService.getAllNotApprovedTrainers(page, 5);
-        return ResponseEntity.ok(slice);
+        Page<TrainerDto> pages = trainerService.getAllNotApprovedTrainers(page, 5);
+        return ResponseEntity.ok(pages);
     }
 
     @PostMapping("/application/process")

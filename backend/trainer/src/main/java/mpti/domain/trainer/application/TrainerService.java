@@ -8,6 +8,7 @@ import mpti.domain.trainer.api.request.UpdateRequest;
 import mpti.domain.trainer.dao.TrainerRepository;
 import mpti.domain.trainer.dto.TrainerDto;
 import mpti.domain.trainer.entity.Trainer;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -117,10 +118,10 @@ public class TrainerService {
         trainer.setApproved(true);
     }
 
-    public Slice<TrainerDto> getAllTrainers(int page, int size, String orderType) {
+    public Page<TrainerDto> getAllTrainers(int page, int size, String orderType) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderType));
-        Slice<Trainer> slice = trainerRepository.findSliceByApproved(true, pageRequest);
-        Slice<TrainerDto> toMap = slice.map(m
+        Page<Trainer> pages = trainerRepository.findPageByApproved(true, pageRequest);
+        Page<TrainerDto> toMap = pages.map(m
                 -> TrainerDto.builder()
                 .name(m.getName())
                 .email(m.getEmail())
@@ -139,10 +140,10 @@ public class TrainerService {
         return toMap;
     }
 
-    public Slice<TrainerDto> getAllNotApprovedTrainers(int page, int size) {
+    public Page<TrainerDto> getAllNotApprovedTrainers(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createAt"));
-        Slice<Trainer> slice = trainerRepository.findSliceByApproved(false, pageRequest);
-        Slice<TrainerDto> toMap = slice.map(m
+        Page<Trainer> pages = trainerRepository.findPageByApproved(false, pageRequest);
+        Page<TrainerDto> toMap = pages.map(m
                 -> TrainerDto.builder()
                 .name(m.getName())
                 .email(m.getEmail())
