@@ -25,7 +25,7 @@ public class TrainerService {
     private final TrainerRepository trainerRepository;
     @Transactional(readOnly = true)
     public void checkDuplicateEmail(String email) {
-        if(trainerRepository.existsByEmail(email)) {
+        if(trainerRepository.findByEmail(email).orElse(null) != null) {
             throw new EmailDuplicateException(email);
         }
     }
