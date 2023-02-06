@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mpti.domain.trainer.api.request.ApprovedRequest;
 import mpti.domain.trainer.api.request.SignUpRequest;
 import mpti.domain.trainer.api.request.UpdateRequest;
+import mpti.domain.trainer.api.response.UserInfoResponse;
 import mpti.domain.trainer.application.FileService;
 import mpti.domain.trainer.application.TrainerService;
 import mpti.domain.trainer.dto.FileDto;
@@ -95,9 +96,11 @@ public class TrainerController {
 
     @GetMapping("/info/name/{id}")
     public ResponseEntity getTrainerName(@PathVariable Long id) {
-        Map<String, String> userInfo = new HashMap<>();
-        userInfo.put("name", trainerService.getName(id));
-        return ResponseEntity.ok(userInfo);
+        UserInfoResponse userInfoResponse = UserInfoResponse
+                .builder()
+                .name(trainerService.getName(id))
+                .build();
+        return ResponseEntity.ok(userInfoResponse);
     }
 
 
