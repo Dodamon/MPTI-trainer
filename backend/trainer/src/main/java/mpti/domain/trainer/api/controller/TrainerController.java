@@ -93,7 +93,7 @@ public class TrainerController {
         }
     }
 
-    @GetMapping("/chat/info/{id}")
+    @GetMapping("/info/name/{id}")
     public ResponseEntity getTrainerName(@PathVariable Long id) {
         Map<String, String> userInfo = new HashMap<>();
         userInfo.put("name", trainerService.getName(id));
