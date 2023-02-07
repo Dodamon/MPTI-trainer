@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mpti.common.exception.EmailDuplicateException;
 import mpti.common.exception.ResourceNotFoundException;
 import mpti.domain.trainer.api.request.SignUpRequest;
+import mpti.domain.trainer.api.request.StopRequest;
 import mpti.domain.trainer.api.request.UpdateRequest;
 import mpti.domain.trainer.dao.TrainerRepository;
 import mpti.domain.trainer.dto.TrainerDto;
@@ -36,16 +37,18 @@ public class TrainerService {
             throw new EmailDuplicateException(signUpRequest.getEmail());
         }
 
-        Trainer trainer = new Trainer();
-                trainer.setName(signUpRequest.getName());
-                trainer.setEmail(signUpRequest.getEmail());
-                trainer.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-                trainer.setBirthday(signUpRequest.getBirthday());
-                trainer.setGender(signUpRequest.getGender());
-                trainer.setPhone(signUpRequest.getPhone());
-                trainer.setAwards(signUpRequest.getAwards());
-                trainer.setLicense(signUpRequest.getLicense());
-                trainer.setCareer(signUpRequest.getCareer());
+        Trainer trainer = Trainer.builder()
+                .name(signUpRequest.getName())
+                .email(signUpRequest.getEmail())
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .birthday(signUpRequest.getBirthday())
+                .gender(signUpRequest.getGender())
+                .phone(signUpRequest.getPhone())
+                .awards(signUpRequest.getAwards())
+                .license(signUpRequest.getLicense())
+                .career(signUpRequest.getCareer())
+                .provider("local")
+                .build();
         trainerRepository.save(trainer);
     }
 
@@ -159,5 +162,15 @@ public class TrainerService {
                 .build()
         );
         return toMap;
+    }
+
+    @Transactional
+    public void setStopUntil(StopRequest stopRequest) {
+        Long userId = stopRequest.getId();
+        Trainer trainer = trainerRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Trainer Id", userId)
+                );
+        trainer.setStopUntil(stopRequest.getStopUntil());
     }
 }

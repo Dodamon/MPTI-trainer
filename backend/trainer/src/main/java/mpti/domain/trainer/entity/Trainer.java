@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "trainer")
 public class Trainer {
@@ -36,8 +37,6 @@ public class Trainer {
     @Column(nullable = false, unique = true)
     private String email;
     private String imageUrl;
-    @Column(nullable = false)
-    private Boolean emailVerified = false;
     private String password;
     @Column(columnDefinition = "varchar(10) default 'local'")
     private String provider;
@@ -51,6 +50,8 @@ public class Trainer {
     @Column(columnDefinition = "double default 0")
     private double stars;
     @DateTimeFormat(pattern = "yyyy-mm-dd")
+    private LocalDate stopUntil;
+    @DateTimeFormat(pattern = "yyyy-mm-dd")
     private LocalDate birthday;
     @CreatedDate
     @Column(name = "create_at")
@@ -63,4 +64,19 @@ public class Trainer {
     }
 
 
+    @Builder
+    public Trainer(Long id, String name, String email, String imageUrl, String password, String provider, String gender, String phone, String awards, String license, String career, LocalDate birthday) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.imageUrl = imageUrl;
+        this.password = password;
+        this.provider = provider;
+        this.gender = gender;
+        this.phone = phone;
+        this.awards = awards;
+        this.license = license;
+        this.career = career;
+        this.birthday = birthday;
+    }
 }

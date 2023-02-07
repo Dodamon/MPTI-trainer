@@ -62,11 +62,12 @@ public class AuthToTrainerController {
             throw new BadRequestException("이미 사용하고 있는 아이디 이메일입니다");
         }
 
-        Trainer user = new Trainer();
-        user.setName(socialSignUpRequest.getName());
-        user.setEmail(socialSignUpRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(socialSignUpRequest.getPassword()));
-        user.setProvider(socialSignUpRequest.getProvider());
+        Trainer user = Trainer.builder()
+                .name(socialSignUpRequest.getName())
+                .email(socialSignUpRequest.getEmail())
+                .password(passwordEncoder.encode(socialSignUpRequest.getPassword()))
+                .provider(socialSignUpRequest.getProvider())
+                .build();
 
         Trainer result = trainerRepository.saveAndFlush(user);
         return ResponseEntity.ok(result);

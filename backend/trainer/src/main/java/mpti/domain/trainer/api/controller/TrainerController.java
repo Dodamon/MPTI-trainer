@@ -122,4 +122,5 @@ public class TrainerController {
         return ResponseEntity.ok(map);
     }
 
+
 }
