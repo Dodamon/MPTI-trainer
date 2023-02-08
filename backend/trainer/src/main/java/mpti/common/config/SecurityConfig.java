@@ -41,29 +41,30 @@ public class SecurityConfig {
                 .formLogin()
                 .disable()
                 .httpBasic()
-                .disable();
+                .disable()
 
-//                // 접근제한 설정
-//                 .authorizeRequests()
-//                 .antMatchers("/",
-//                         "/error",
-//                         "/favicon.ico",
-//                         "/**/*.png",
-//                         "/**/*.gif",
-//                         "/**/*.svg",
-//                         "/**/*.jpg",
-//                         "/**/*.html",
-//                         "/**/*.css",
-//                         "/**/*.js")
-//                 .permitAll()
-//                 .antMatchers("/api/auth/**")
-//                 .permitAll()
+                // 접근제한 설정
+                 .authorizeRequests()
+                 .antMatchers("/",
+                         "/error",
+                         "/favicon.ico",
+                         "/**/*.png",
+                         "/**/*.gif",
+                         "/**/*.svg",
+                         "/**/*.jpg",
+                         "/**/*.html",
+                         "/**/*.css",
+                         "/**/*.js")
+                 .permitAll()
+//                 .antMatchers("/api/trainer/api/auth/**")
+                 .antMatchers("/**")
+                 .permitAll()
 //                 .anyRequest()
 //                 .authenticated()
-//                 .and();
-//
-//         // 토큰 유효성 검사 필터
-//        httpSecurity.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                 .and();
+
+         // 토큰 유효성 검사 필터
+        //httpSecurity.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

@@ -4,15 +4,25 @@ import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.stream.Collectors;
 
 @Service
 public class TokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
 
+    private static final String AUTHORITIES_KEY = "auth";
+
     @Value("${app.auth.tokenSecret:}")
     private String SECRET_KEY;
+
+    @Value("${app.auth.accessTokenExpirationMsec}")
+    private long ACCESS_TOKEN_EXPIRATION;
 
 
     public String getUserIdFromToken(String token) {
@@ -21,27 +31,65 @@ public class TokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
+        logger.info("authentication");
+        logger.info(claims.getSubject());
+        logger.info(claims.getId());
+
         return claims.getSubject();
     }
 
     public boolean validateToken(String authToken) {
-        logger.info("토큰 겁사필터 시작");
+        logger.info("Custom validateToken filter start");
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(authToken);
-            logger.info("유효한 jwt access tocken 입니다");
+            logger.info("Valid JWT access token");
             return true;
         } catch (SignatureException ex) {
-            logger.error("유효하지 않은 jwt access tocken 서명입니다"); //"Invalid JWT signature"
+            logger.error("Invalid JWT access signature"); //"Invalid JWT signature"
         } catch (MalformedJwtException ex) {
-            logger.error("유효하지 않은 jwt access tocken 입니다"); // Invalid JWT token
+            logger.error("Invalid JWT access token"); // Invalid JWT token
         } catch (ExpiredJwtException ex) {
-            logger.error("만료된 jwt access tocken 입니다"); // Expired JWT token
+            logger.error("Expired JWT access token"); // Expired JWT token
         } catch (UnsupportedJwtException ex) {
-            logger.error("지원하지 않는 형식의 jwt access tocken 입니다"); // Unsupported JWT token
+            logger.error("Unsupported JWT access token"); // Unsupported JWT token
         } catch (IllegalArgumentException ex) {
-            logger.error("jwt access tocken의 claims이 비어 있습니다"); // JWT claims string is empty.
+            logger.error("JWT access claims string is empty"); // JWT claims string is empty.
         }
         return false;
     }
 
+    public boolean isExpiredToken(String authToken) {
+
+        try {
+            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(authToken);
+            return true;
+        } catch (ExpiredJwtException ex) {
+            logger.error("Expired Refresh JWT token");
+            return true;
+        } catch (Exception ex) {
+            logger.error("JWT refresh token error");
+        }
+
+        return false;
+    }
+
+    public String createAccessToken(Authentication authentication) {
+
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION);
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .setId(userPrincipal.getName())
+                .claim(AUTHORITIES_KEY, authorities)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
+    }
 }
