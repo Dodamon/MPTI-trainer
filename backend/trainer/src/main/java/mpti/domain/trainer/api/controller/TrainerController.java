@@ -77,7 +77,7 @@ public class TrainerController {
 
     @GetMapping("/application/list/{page}")
     public ResponseEntity getTrainerApplicationList(@PathVariable int page) {
-        Page<TrainerDto> pages = trainerService.getAllNotApprovedTrainers(page, 5);
+        Page<TrainerDto> pages = trainerService.getAllNotApprovedTrainers(page, 4);
         return ResponseEntity.ok(pages);
     }
 
