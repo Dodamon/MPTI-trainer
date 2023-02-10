@@ -21,4 +21,14 @@ public class ServerController {
         trainerService.setStopUntil(stopRequest);
         return ResponseEntity.ok("stop trainer success");
     }
+
+    @GetMapping("/info/name/{id}")
+    public ResponseEntity getTrainerName(@PathVariable Long id) {
+        UserInfoResponse userInfoResponse = UserInfoResponse
+                .builder()
+                .name(trainerService.getName(id))
+                .build();
+        return ResponseEntity.ok(userInfoResponse);
+    }
+
 }

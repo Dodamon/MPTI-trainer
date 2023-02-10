@@ -12,6 +12,7 @@ import mpti.domain.trainer.dto.TrainerDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import mpti.domain.trainer.application.S3Service;
 import javax.validation.Valid;
@@ -46,18 +47,21 @@ public class TrainerController {
     }
 
     @GetMapping("/info/{email}")
+//    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
     public ResponseEntity getTrainerInfo(@PathVariable String email) {
         TrainerDto trainerDto = trainerService.getInfo(email);
         return ResponseEntity.ok(trainerDto);
     }
 
     @PostMapping("/info/update/{email}")
+//    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
     public ResponseEntity updateTrainerInfo(@PathVariable String email, @RequestBody UpdateRequest updateRequest) {
         TrainerDto trainerDto = trainerService.updateInfo(email, updateRequest);
         return ResponseEntity.ok(trainerDto);
     }
 
     @GetMapping("/info/delete/{email}")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity deleteTrainer(@PathVariable String email) {
         trainerService.deleteInfo(email);
         return ResponseEntity.ok("delete success");
@@ -76,12 +80,14 @@ public class TrainerController {
     }
 
     @GetMapping("/application/list/{page}")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity getTrainerApplicationList(@PathVariable int page) {
         Page<TrainerDto> pages = trainerService.getAllNotApprovedTrainers(page, 4);
         return ResponseEntity.ok(pages);
     }
 
     @PostMapping("/application/process")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity processTrainerApplicationList(@Valid @RequestBody ApprovedRequest approvedRequest) {
         Boolean approved = approvedRequest.getApproved();
         System.out.println(approved);
@@ -94,31 +100,16 @@ public class TrainerController {
         }
     }
 
-    @GetMapping("/info/name/{id}")
-    public ResponseEntity getTrainerName(@PathVariable Long id) {
-        UserInfoResponse userInfoResponse = UserInfoResponse
-                .builder()
-                .name(trainerService.getName(id))
-                .build();
-        return ResponseEntity.ok(userInfoResponse);
-    }
 
-
-    @GetMapping("/upload")
-    public String goToUpload() {
-        return "upload";
-    }
-
-    @PostMapping("info/imageurl")
-    @ResponseBody
+    @PostMapping("/upload")
     public ResponseEntity uploadFile(FileDto fileDto) throws IOException {
-        String url = s3Service.uploadFile(fileDto.getFile());
+        String url = s3Service.uploadFile(fileDto.getFile(), fileDto.getEmail());
+        System.out.println(url);
         fileDto.setUrl(url);
         fileService.save(fileDto);
 
         Map<String, String> map = new HashMap<>();
         map.put("imageUrl", url);
-
         return ResponseEntity.ok(map);
     }
 

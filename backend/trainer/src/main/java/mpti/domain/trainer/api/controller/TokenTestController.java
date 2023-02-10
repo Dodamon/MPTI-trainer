@@ -31,7 +31,7 @@ public class TokenTestController {
             Map<String, String> response = new HashMap<>();
 
         response.put("id", userPrincipal.getId() + "");
-        response.put("name", userPrincipal.getUsername());
+        response.put("name", userPrincipal.getName());
         response.put("email", userPrincipal.getEmail());
         response.put("password", userPrincipal.getPassword());
 

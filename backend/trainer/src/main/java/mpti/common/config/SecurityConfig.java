@@ -21,9 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 )
 public class SecurityConfig {
 //    @Bean
-//    public TokenAuthenticationFilter tokenAuthenticationFilter() {
-//        return new TokenAuthenticationFilter();
-//    }
+//    public TokenAuthenticationFilter tokenAuthenticationFilter() { return new TokenAuthenticationFilter();}
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -41,30 +39,32 @@ public class SecurityConfig {
                 .formLogin()
                 .disable()
                 .httpBasic()
-                .disable()
+                .disable();
 
                 // 접근제한 설정
-                 .authorizeRequests()
-                 .antMatchers("/",
-                         "/error",
-                         "/favicon.ico",
-                         "/**/*.png",
-                         "/**/*.gif",
-                         "/**/*.svg",
-                         "/**/*.jpg",
-                         "/**/*.html",
-                         "/**/*.css",
-                         "/**/*.js")
-                 .permitAll()
-//                 .antMatchers("/api/trainer/api/auth/**")
-                 .antMatchers("/**")
-                 .permitAll()
-//                 .anyRequest()
-//                 .authenticated()
-                 .and();
+//                 .authorizeRequests()
+//                 .antMatchers("/",
+//                         "/error",
+//                         "/favicon.ico",
+//                         "/**/*.png",
+//                         "/**/*.gif",
+//                         "/**/*.svg",
+//                         "/**/*.jpg",
+//                         "/**/*.html",
+//                         "/**/*.css",
+//                         "/**/*.js")
+//                 .permitAll()
+//                 .antMatchers("/api/trainer/api/auth/**",
+//                         "/api/trainer/test",
+//                         "/api/trainer/admin/stop",
+//                         "api/trainer/info/name/**",
+//                         "api/trainer/list/**",
+//                         "api/trainer/listbystar/**").permitAll()
+//                 .anyRequest().authenticated()
+//                 .and();
 
-         // 토큰 유효성 검사 필터
-        //httpSecurity.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//          토큰 유효성 검사 필터
+//        httpSecurity.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

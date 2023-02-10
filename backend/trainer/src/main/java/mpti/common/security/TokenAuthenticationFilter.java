@@ -1,11 +1,18 @@
 package mpti.common.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import mpti.domain.trainer.application.TrainerAuthService;
+import mpti.domain.trainer.dto.TokenDto;
+import org.hibernate.annotations.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -18,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -32,6 +38,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
+    @Value("${app.auth.tokenSecret:}")
+    private String SECRET_KEY;
+
+    private static final String AUTHORITIES_KEY = "auth";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
@@ -39,31 +50,43 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             String refreshToken = getRefreshJwtFromRequest(request);
 
             if (StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
-                String userEmail = tokenProvider.getUserIdFromToken(accessToken);
 
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                Authentication auth = tokenProvider.getAuthentication(accessToken);// 인증 객체 생성
+                SecurityContextHolder.getContext().setAuthentication(auth);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+//                String userEmail = tokenProvider.getUserIdFromToken(accessToken);
+//                UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
+//                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//
+//                SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } else if( tokenProvider.isExpiredToken(accessToken)) {
                 logger.info("Access token is expired");
                 if(tokenProvider.validateToken(refreshToken)) {
                     // Redis DB에 확인
-                    if(!trainerAuthService.isValidDB(refreshToken)) {
+
+                    TokenDto tokenDto = trainerAuthService.getNewAccessToken(refreshToken);
+                    if(tokenDto.getState() == false) {
                         throw new RuntimeException("Refresh token is not in DB");
                     } else {
-                        // Redis DB 확인 완료 후 access token 재발급
+                        // Redis DB 확인 완료 후 access token 재발급 -> 인증 서버에서
+                        accessToken = tokenDto.getAccessToken();
+                        Authentication auth = tokenProvider.getAuthentication(accessToken);    // 인증 객체 생성
+                        SecurityContextHolder.getContext().setAuthentication(auth);
 
-                        String userEmail = tokenProvider.getUserIdFromToken(refreshToken);
-                        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                        accessToken = tokenProvider.createAccessToken(authentication);
+//                        String userEmail = tokenProvider.getUserIdFromToken(refreshToken);
+//                        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
+//                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//
+//                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//                        accessToken = tokenProvider.createAccessToken(authentication);
+//
+//                        Authentication auth = tokenProvider.getAuthentication(accessToken);    // 인증 객체 생성
+//                        SecurityContextHolder.getContext().setAuthentication(auth);
 
                         response.setHeader("Authorization", "Bearer " + accessToken);
                     }

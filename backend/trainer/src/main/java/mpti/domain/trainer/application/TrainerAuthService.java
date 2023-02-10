@@ -26,10 +26,10 @@ public class TrainerAuthService {
     @Value("${app.auth.authServerUrl}")
     private String SERVER_URL;
 
-    public boolean isValidDB(String refreshToken) {
+    @Value("${app.auth.userServerUrl}")
+    private String USER_URL;
 
-//        Map<String, String> TokenValidrequest = new HashMap<>();
-//        TokenValidrequest.put("refresh_token", refreshToken);
+    public boolean isValidDB(String refreshToken) {
 
         TokenDto tokenDto = new TokenDto();
         tokenDto.setRefreshToken(refreshToken);
@@ -53,5 +53,31 @@ public class TrainerAuthService {
         }
 
         return tokenDto.getState();
+    }
+
+    public TokenDto getNewAccessToken(String refreshToken) {
+
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setRefreshToken(refreshToken);
+        tokenDto.setState(false);
+
+        String json = gson.toJson(tokenDto);
+
+        RequestBody requestBody = RequestBody.create(MediaType.get("application/json; charset=utf-8"), json);
+        Request request = new Request.Builder()
+                .url(SERVER_URL + "/token")
+                .post(requestBody)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()){
+                String st = response.body().string();
+                tokenDto = gson.fromJson(st, TokenDto.class);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return tokenDto;
     }
 }
