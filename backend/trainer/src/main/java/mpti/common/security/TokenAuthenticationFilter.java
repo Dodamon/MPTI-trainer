@@ -1,8 +1,11 @@
 package mpti.common.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import mpti.common.errors.TokenNotFoundException;
 import mpti.domain.trainer.application.TrainerAuthService;
 import mpti.domain.trainer.dto.TokenDto;
 import org.hibernate.annotations.Filter;
@@ -16,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,14 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-
-    @Autowired
     private TokenProvider tokenProvider;
-
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-
-    @Autowired
     private TrainerAuthService trainerAuthService;
 
     private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
@@ -43,24 +40,29 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORITIES_KEY = "auth";
 
+    public TokenAuthenticationFilter(TokenProvider tokenProvider, TrainerAuthService trainerAuthService) {
+        this.tokenProvider = tokenProvider;
+        this.trainerAuthService = trainerAuthService;
+    }
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, TokenNotFoundException, ExpiredJwtException {
+
         try {
             String accessToken = getJwtFromRequest(request);
             String refreshToken = getRefreshJwtFromRequest(request);
 
-            if (StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
+            if (!StringUtils.hasText(accessToken) ) {
+                throw new TokenNotFoundException("Access 토큰을 찾을 수 없습니다");
+            }
 
-                Authentication auth = tokenProvider.getAuthentication(accessToken);// 인증 객체 생성
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            if( tokenProvider.validateToken(accessToken)) {
 
+//                Authentication auth = tokenProvider.getAuthentication(accessToken);// 인증 객체 생성
+                UsernamePasswordAuthenticationToken authentication = tokenProvider.getAuthentication(accessToken);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-//                String userEmail = tokenProvider.getUserIdFromToken(accessToken);
-//                UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
-//                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } else if( tokenProvider.isExpiredToken(accessToken)) {
                 logger.info("Access token is expired");
@@ -69,39 +71,28 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
                     TokenDto tokenDto = trainerAuthService.getNewAccessToken(refreshToken);
                     if(tokenDto.getState() == false) {
-                        throw new RuntimeException("Refresh token is not in DB");
+                        throw new ExpiredJwtException(null, null, "Refresh 토큰이 만료되었습니다 다시 로그인 해주세요");
                     } else {
                         // Redis DB 확인 완료 후 access token 재발급 -> 인증 서버에서
                         accessToken = tokenDto.getAccessToken();
-                        Authentication auth = tokenProvider.getAuthentication(accessToken);    // 인증 객체 생성
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-
-//                        String userEmail = tokenProvider.getUserIdFromToken(refreshToken);
-//                        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
-//                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//
-//                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//                        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//                        accessToken = tokenProvider.createAccessToken(authentication);
-//
-//                        Authentication auth = tokenProvider.getAuthentication(accessToken);    // 인증 객체 생성
-//                        SecurityContextHolder.getContext().setAuthentication(auth);
-
+                        UsernamePasswordAuthenticationToken authentication = tokenProvider.getAuthentication(accessToken);
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                         response.setHeader("Authorization", "Bearer " + accessToken);
                     }
 
                 } else {
-                    throw new RuntimeException("Refresh token is not valid");
+                    throw new JwtException("Refresh 토큰이 유효하지 않습니다");
                 }
             }
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
-            throw new RuntimeException(ex);
+            throw new IllegalArgumentException(ex);
         }
 
         logger.info("토큰 검사 완료");
         filterChain.doFilter(request, response);
+
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
@@ -119,4 +110,5 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
 }

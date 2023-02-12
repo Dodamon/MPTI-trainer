@@ -32,6 +32,7 @@ public class TrainerDto {
     private String imageUrl;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
+//    private LocalDate stopUntil;
 
 
     public void setTitle(String title) {

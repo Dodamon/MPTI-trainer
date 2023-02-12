@@ -65,7 +65,7 @@ public class Trainer {
 
 
     @Builder
-    public Trainer(Long id, String name, String email, String imageUrl, String password, String provider, String gender, String phone, String awards, String license, String career, LocalDate birthday) {
+    public Trainer(Long id, String name, String email, String imageUrl, String password, String provider, String gender, String phone, String awards, String license, String career, LocalDate birthday, LocalDate stopUntil) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -78,5 +78,6 @@ public class Trainer {
         this.license = license;
         this.career = career;
         this.birthday = birthday;
+        this.stopUntil = stopUntil;
     }
 }

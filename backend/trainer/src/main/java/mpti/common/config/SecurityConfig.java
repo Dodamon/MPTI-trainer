@@ -1,6 +1,11 @@
 package mpti.common.config;
 
+import mpti.common.security.ExceptionHandlerFilter;
 import mpti.common.security.TokenAuthenticationFilter;
+import mpti.common.security.TokenProvider;
+import mpti.domain.trainer.application.TrainerAuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -20,14 +25,50 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         prePostEnabled = true
 )
 public class SecurityConfig {
+
 //    @Bean
-//    public TokenAuthenticationFilter tokenAuthenticationFilter() { return new TokenAuthenticationFilter();}
+//    public TokenAuthenticationFilter tokenAuthenticationFilter() {
+//
+//
+//        return new TokenAuthenticationFilter();}
+    @Autowired
+    private TokenProvider tokenProvider;
+    @Autowired
+    private TrainerAuthService trainerAuthService;
+
+    @Bean
+    public  FilterRegistrationBean tokenAuthenticationFilterRegister() {
+        FilterRegistrationBean<TokenAuthenticationFilter> registrationBean = new FilterRegistrationBean<>(new TokenAuthenticationFilter(tokenProvider, trainerAuthService));
+        registrationBean.addUrlPatterns(
+                //ROLE_TRAINER
+                "/api/trainer/info/update",
+                "/api/trainer/upload",
+                // ROLE_ADMIN
+                "/api/trainer/info/delete/*",
+                "/api/trainer/application/process"
+        );
+        registrationBean.setOrder(1);
+        return registrationBean;
+    }
+
+    @Bean FilterRegistrationBean tokenExceptionHandlerFilterRegister() {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean(new ExceptionHandlerFilter());
+        registrationBean.setOrder(0);
+        return  registrationBean;
+    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+        httpSecurity
+                .headers()
+                .xssProtection()
+                .and()
+                .contentSecurityPolicy("script-src 'self'");
+
         httpSecurity
                 .cors()
                 .and()
@@ -40,31 +81,6 @@ public class SecurityConfig {
                 .disable()
                 .httpBasic()
                 .disable();
-
-                // 접근제한 설정
-//                 .authorizeRequests()
-//                 .antMatchers("/",
-//                         "/error",
-//                         "/favicon.ico",
-//                         "/**/*.png",
-//                         "/**/*.gif",
-//                         "/**/*.svg",
-//                         "/**/*.jpg",
-//                         "/**/*.html",
-//                         "/**/*.css",
-//                         "/**/*.js")
-//                 .permitAll()
-//                 .antMatchers("/api/trainer/api/auth/**",
-//                         "/api/trainer/test",
-//                         "/api/trainer/admin/stop",
-//                         "api/trainer/info/name/**",
-//                         "api/trainer/list/**",
-//                         "api/trainer/listbystar/**").permitAll()
-//                 .anyRequest().authenticated()
-//                 .and();
-
-//          토큰 유효성 검사 필터
-//        httpSecurity.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

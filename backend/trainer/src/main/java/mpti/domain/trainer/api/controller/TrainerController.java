@@ -1,6 +1,7 @@
 package mpti.domain.trainer.api.controller;
 
 import lombok.RequiredArgsConstructor;
+import mpti.common.security.UserPrincipal;
 import mpti.domain.trainer.api.request.ApprovedRequest;
 import mpti.domain.trainer.api.request.SignUpRequest;
 import mpti.domain.trainer.api.request.UpdateRequest;
@@ -9,10 +10,12 @@ import mpti.domain.trainer.application.FileService;
 import mpti.domain.trainer.application.TrainerService;
 import mpti.domain.trainer.dto.FileDto;
 import mpti.domain.trainer.dto.TrainerDto;
+import org.springframework.context.annotation.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import mpti.domain.trainer.application.S3Service;
 import javax.validation.Valid;
@@ -46,22 +49,23 @@ public class TrainerController {
         return ResponseEntity.ok("join success");
     }
 
-    @GetMapping("/info/{email}")
-//    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
+    @GetMapping("/info")
+
     public ResponseEntity getTrainerInfo(@PathVariable String email) {
         TrainerDto trainerDto = trainerService.getInfo(email);
         return ResponseEntity.ok(trainerDto);
     }
 
-    @PostMapping("/info/update/{email}")
-//    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
-    public ResponseEntity updateTrainerInfo(@PathVariable String email, @RequestBody UpdateRequest updateRequest) {
+    @PostMapping("/info/update")
+    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
+    public ResponseEntity updateTrainerInfo(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody UpdateRequest updateRequest) {
+        String email = userPrincipal.getEmail();
         TrainerDto trainerDto = trainerService.updateInfo(email, updateRequest);
         return ResponseEntity.ok(trainerDto);
     }
 
     @GetMapping("/info/delete/{email}")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity deleteTrainer(@PathVariable String email) {
         trainerService.deleteInfo(email);
         return ResponseEntity.ok("delete success");
@@ -80,14 +84,14 @@ public class TrainerController {
     }
 
     @GetMapping("/application/list/{page}")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity getTrainerApplicationList(@PathVariable int page) {
         Page<TrainerDto> pages = trainerService.getAllNotApprovedTrainers(page, 4);
         return ResponseEntity.ok(pages);
     }
 
     @PostMapping("/application/process")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity processTrainerApplicationList(@Valid @RequestBody ApprovedRequest approvedRequest) {
         Boolean approved = approvedRequest.getApproved();
         System.out.println(approved);

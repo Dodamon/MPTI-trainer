@@ -29,13 +29,11 @@ public class TokenTestController {
             System.out.println(userPrincipal.getEmail());
 
             Map<String, String> response = new HashMap<>();
+            response.put("id", userPrincipal.getId() + "");
+            response.put("name", userPrincipal.getUsername());
+            response.put("password", userPrincipal.getPassword());
 
-        response.put("id", userPrincipal.getId() + "");
-        response.put("name", userPrincipal.getName());
-        response.put("email", userPrincipal.getEmail());
-        response.put("password", userPrincipal.getPassword());
-
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user")

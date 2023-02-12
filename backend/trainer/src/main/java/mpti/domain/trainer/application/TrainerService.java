@@ -1,8 +1,8 @@
 package mpti.domain.trainer.application;
 
 import lombok.RequiredArgsConstructor;
-import mpti.common.exception.EmailDuplicateException;
-import mpti.common.exception.ResourceNotFoundException;
+import mpti.common.errors.EmailDuplicateException;
+import mpti.common.errors.ResourceNotFoundException;
 import mpti.domain.trainer.api.request.SignUpRequest;
 import mpti.domain.trainer.api.request.StopRequest;
 import mpti.domain.trainer.api.request.UpdateRequest;
@@ -11,12 +11,13 @@ import mpti.domain.trainer.dto.TrainerDto;
 import mpti.domain.trainer.entity.Trainer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +48,7 @@ public class TrainerService {
                 .awards(signUpRequest.getAwards())
                 .license(signUpRequest.getLicense())
                 .career(signUpRequest.getCareer())
+                .stopUntil(LocalDate.now().minusDays(1))
                 .provider("local")
                 .build();
         trainerRepository.save(trainer);

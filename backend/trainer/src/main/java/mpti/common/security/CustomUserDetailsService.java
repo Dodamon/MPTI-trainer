@@ -1,7 +1,7 @@
 package mpti.common.security;
 
 import lombok.RequiredArgsConstructor;
-import mpti.common.exception.ResourceNotFoundException;
+import mpti.common.errors.ResourceNotFoundException;
 import mpti.domain.trainer.dao.TrainerRepository;
 import mpti.domain.trainer.entity.Trainer;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,8 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 
 @Service

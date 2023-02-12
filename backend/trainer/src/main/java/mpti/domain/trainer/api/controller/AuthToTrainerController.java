@@ -3,7 +3,8 @@ package mpti.domain.trainer.api.controller;
 
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-import mpti.common.exception.BadRequestException;
+import mpti.common.errors.BadRequestException;
+import mpti.common.errors.EmailDuplicateException;
 import mpti.common.security.UserPrincipal;
 import mpti.domain.trainer.api.request.LoginRequest;
 import mpti.domain.trainer.api.request.SocialSignUpRequest;
@@ -59,7 +60,7 @@ public class AuthToTrainerController {
     @PostMapping("/signup")
     public ResponseEntity<Trainer> registerUser(@Valid @RequestBody SocialSignUpRequest socialSignUpRequest) {
         if(trainerRepository.existsByEmail(socialSignUpRequest.getEmail())) {
-            throw new BadRequestException("이미 사용하고 있는 아이디 이메일입니다");
+            throw new EmailDuplicateException("이미 사용하고 있는 아이디 이메일입니다");
         }
 
         Trainer user = Trainer.builder()
@@ -91,15 +92,15 @@ public class AuthToTrainerController {
         return result;
     }
 
-    /**
-     * 권한 테스트
-     * @param userPrincipal
-     * @return
-     */
-    @GetMapping("/test")
-    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
-    public ResponseEntity<?> test(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        System.out.println(userPrincipal.getEmail());
-        return ResponseEntity.ok("토큰 테스트 완료");
-    }
+//    /**
+//     * 권한 테스트
+//     * @param userPrincipal
+//     * @return
+//     */
+//    @GetMapping("/test")
+//    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
+//    public ResponseEntity<?> test(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+//        System.out.println(userPrincipal.getEmail());
+//        return ResponseEntity.ok("토큰 테스트 완료");
+//    }
 }

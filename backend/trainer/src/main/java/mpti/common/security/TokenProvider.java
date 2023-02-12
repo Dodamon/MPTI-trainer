@@ -43,7 +43,7 @@ public class TokenProvider {
     }
 
     // 토큰을 받아 클레임을 만들고 권한정보를 빼서 시큐리티 유저객체를 만들어 Authentication 객체 반환
-    public Authentication getAuthentication(String token) {
+    public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         Claims claims = Jwts
                 .parserBuilder()
                 .setSigningKey(SECRET_KEY)
@@ -58,12 +58,13 @@ public class TokenProvider {
 
         UserPrincipal principal = new UserPrincipal( Long.parseLong(claims.getId()), claims.getSubject(), "", authorities);
 
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
 
 
     public boolean validateToken(String authToken) {
-        logger.info("Custom validateToken filter start");
+        logger.info("Custom validateAccessToken filter start");
+
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(authToken);
             logger.info("Valid JWT access token");
@@ -83,6 +84,7 @@ public class TokenProvider {
     }
 
     public boolean isExpiredToken(String authToken) {
+        logger.info("Custom validateRefreshToken filter start");
 
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(authToken);
