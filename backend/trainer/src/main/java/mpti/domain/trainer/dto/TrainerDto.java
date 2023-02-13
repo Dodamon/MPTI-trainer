@@ -14,6 +14,8 @@ import java.util.ArrayList;
 @Data
 @Builder
 public class TrainerDto {
+
+    private Long id;
     @Column(nullable = false)
     private String name;
     @Email

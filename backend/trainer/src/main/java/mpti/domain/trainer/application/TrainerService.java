@@ -62,6 +62,7 @@ public class TrainerService {
                 );
 
         TrainerDto trainerDto = TrainerDto.builder()
+                .id(trainer.getId())
                 .name(trainer.getName())
                 .email(trainer.getEmail())
                 .birthday(trainer.getBirthday())
