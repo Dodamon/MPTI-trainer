@@ -49,7 +49,7 @@ public class TrainerController {
         return ResponseEntity.ok("join success");
     }
 
-    @GetMapping("/info")
+    @GetMapping("/info/{email}")
     public ResponseEntity getTrainerInfo(@PathVariable String email) {
         TrainerDto trainerDto = trainerService.getInfo(email);
         return ResponseEntity.ok(trainerDto);
