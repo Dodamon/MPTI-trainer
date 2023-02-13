@@ -50,14 +50,13 @@ public class TrainerController {
     }
 
     @GetMapping("/info")
-
     public ResponseEntity getTrainerInfo(@PathVariable String email) {
         TrainerDto trainerDto = trainerService.getInfo(email);
         return ResponseEntity.ok(trainerDto);
     }
 
     @PostMapping("/info/update")
-    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
+//    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
     public ResponseEntity updateTrainerInfo(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody UpdateRequest updateRequest) {
         String email = userPrincipal.getEmail();
         TrainerDto trainerDto = trainerService.updateInfo(email, updateRequest);
@@ -65,7 +64,7 @@ public class TrainerController {
     }
 
     @GetMapping("/info/delete/{email}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity deleteTrainer(@PathVariable String email) {
         trainerService.deleteInfo(email);
         return ResponseEntity.ok("delete success");
@@ -91,7 +90,7 @@ public class TrainerController {
     }
 
     @PostMapping("/application/process")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity processTrainerApplicationList(@Valid @RequestBody ApprovedRequest approvedRequest) {
         Boolean approved = approvedRequest.getApproved();
         System.out.println(approved);

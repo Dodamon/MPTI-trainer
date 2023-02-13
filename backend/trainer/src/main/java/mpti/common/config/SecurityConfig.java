@@ -30,26 +30,26 @@ public class SecurityConfig {
     @Autowired
     private TrainerAuthService trainerAuthService;
 
-    @Bean
-    public  FilterRegistrationBean tokenAuthenticationFilterRegister() {
-        FilterRegistrationBean<TokenAuthenticationFilter> registrationBean = new FilterRegistrationBean<>(new TokenAuthenticationFilter(tokenProvider, trainerAuthService));
-        registrationBean.addUrlPatterns(
-                //ROLE_TRAINER
-                "/api/trainer/info/update",
-                "/api/trainer/upload",
-                // ROLE_ADMIN
-                "/api/trainer/info/delete/*",
-                "/api/trainer/application/process"
-        );
-        registrationBean.setOrder(1);
-        return registrationBean;
-    }
-
-    @Bean FilterRegistrationBean tokenExceptionHandlerFilterRegister() {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean(new ExceptionHandlerFilter());
-        registrationBean.setOrder(0);
-        return  registrationBean;
-    }
+//    @Bean
+//    public  FilterRegistrationBean tokenAuthenticationFilterRegister() {
+//        FilterRegistrationBean<TokenAuthenticationFilter> registrationBean = new FilterRegistrationBean<>(new TokenAuthenticationFilter(tokenProvider, trainerAuthService));
+//        registrationBean.addUrlPatterns(
+//                //ROLE_TRAINER
+//                "/api/trainer/info/update",
+//                "/api/trainer/upload",
+//                // ROLE_ADMIN
+//                "/api/trainer/info/delete/*",
+//                "/api/trainer/application/process"
+//        );
+//        registrationBean.setOrder(1);
+//        return registrationBean;
+//    }
+//
+//    @Bean FilterRegistrationBean tokenExceptionHandlerFilterRegister() {
+//        FilterRegistrationBean registrationBean = new FilterRegistrationBean(new ExceptionHandlerFilter());
+//        registrationBean.setOrder(0);
+//        return  registrationBean;
+//    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
