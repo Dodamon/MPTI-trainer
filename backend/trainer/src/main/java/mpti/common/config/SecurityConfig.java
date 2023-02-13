@@ -25,12 +25,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         prePostEnabled = true
 )
 public class SecurityConfig {
-
-//    @Bean
-//    public TokenAuthenticationFilter tokenAuthenticationFilter() {
-//
-//
-//        return new TokenAuthenticationFilter();}
     @Autowired
     private TokenProvider tokenProvider;
     @Autowired

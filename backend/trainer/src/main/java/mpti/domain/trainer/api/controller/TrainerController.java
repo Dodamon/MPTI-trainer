@@ -84,7 +84,7 @@ public class TrainerController {
     }
 
     @GetMapping("/application/list/{page}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity getTrainerApplicationList(@PathVariable int page) {
         Page<TrainerDto> pages = trainerService.getAllNotApprovedTrainers(page, 4);
         return ResponseEntity.ok(pages);

@@ -25,9 +25,6 @@ public class TokenProvider {
     @Value("${app.auth.tokenSecret:}")
     private String SECRET_KEY;
 
-    @Value("${app.auth.accessTokenExpirationMsec}")
-    private long ACCESS_TOKEN_EXPIRATION;
-
 
     public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
@@ -99,23 +96,23 @@ public class TokenProvider {
         return false;
     }
 
-    public String createAccessToken(Authentication authentication) {
-
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION);
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
-        return Jwts.builder()
-                .setSubject(authentication.getName())
-                .setId(userPrincipal.getName())
-                .claim(AUTHORITIES_KEY, authorities)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .compact();
-    }
+//    public String createAccessToken(Authentication authentication) {
+//
+//        String authorities = authentication.getAuthorities().stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .collect(Collectors.joining(","));
+//
+//        Date now = new Date();
+//        Date expiryDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION);
+//        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+//
+//        return Jwts.builder()
+//                .setSubject(authentication.getName())
+//                .setId(userPrincipal.getName())
+//                .claim(AUTHORITIES_KEY, authorities)
+//                .setIssuedAt(now)
+//                .setExpiration(expiryDate)
+//                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+//                .compact();
+//    }
 }
