@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -176,4 +175,28 @@ public class TrainerService {
                 );
         trainer.setStopUntil(stopRequest.getStopUntil());
     }
+
+    @Transactional
+    public Page<TrainerDto> searchTrainer(String word, int page, int size) {
+
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "stars"));
+        Page<Trainer> pages = trainerRepository.findPageByApprovedAndNameContaining(true, word, pageRequest);
+        Page<TrainerDto> toMap = pages.map(m
+                -> TrainerDto.builder()
+                .name(m.getName())
+                .email(m.getEmail())
+                .birthday(m.getBirthday())
+                .gender(m.getGender())
+                .phone(m.getPhone())
+                .awards(m.getAwards())
+                .license(m.getLicense())
+                .career(m.getCareer())
+                .imageUrl(m.getImageUrl())
+                .stars(m.getStars())
+                .createAt(m.getCreateAt())
+                .build()
+        );
+        return toMap;
+    }
+
 }

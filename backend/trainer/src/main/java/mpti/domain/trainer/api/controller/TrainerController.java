@@ -72,13 +72,13 @@ public class TrainerController {
 
     @GetMapping("/list/{page}")
     public ResponseEntity getTrainerListByDate(@PathVariable int page) {
-        Page<TrainerDto> pages = trainerService.getAllTrainers(page, 5, "createAt");
+        Page<TrainerDto> pages = trainerService.getAllTrainers(page, 8, "createAt");
         return ResponseEntity.ok(pages);
     }
 
     @GetMapping("/listbystar/{page}")
     public ResponseEntity getTrainerListByStar(@PathVariable int page) {
-        Page<TrainerDto> pages = trainerService.getAllTrainers(page, 5, "stars");
+        Page<TrainerDto> pages = trainerService.getAllTrainers(page, 8, "stars");
         return ResponseEntity.ok(pages);
     }
 
@@ -114,6 +114,12 @@ public class TrainerController {
         Map<String, String> map = new HashMap<>();
         map.put("imageUrl", url);
         return ResponseEntity.ok(map);
+    }
+
+    @GetMapping("/search/{page}/{word}")
+    public ResponseEntity search(@PathVariable int page, @PathVariable String word) {
+        Page<TrainerDto> pages = trainerService.searchTrainer(word, page, 8);
+        return ResponseEntity.ok(pages);
     }
 
 
