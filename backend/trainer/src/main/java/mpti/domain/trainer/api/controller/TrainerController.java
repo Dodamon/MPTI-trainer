@@ -55,10 +55,10 @@ public class TrainerController {
         return ResponseEntity.ok(trainerDto);
     }
 
-    @PostMapping("/info/update")
+    @PostMapping("/info/update/{email}")
 //    @PreAuthorize("hasAuthority('ROLE_TRAINER')")
-    public ResponseEntity updateTrainerInfo(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody UpdateRequest updateRequest) {
-        String email = userPrincipal.getEmail();
+    public ResponseEntity updateTrainerInfo(@PathVariable String email, @RequestBody UpdateRequest updateRequest) {
+//        String email = userPrincipal.getEmail();
         TrainerDto trainerDto = trainerService.updateInfo(email, updateRequest);
         return ResponseEntity.ok(trainerDto);
     }
