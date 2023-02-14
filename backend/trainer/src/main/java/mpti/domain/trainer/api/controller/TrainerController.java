@@ -116,11 +116,19 @@ public class TrainerController {
         return ResponseEntity.ok(map);
     }
 
-    @GetMapping("/search/{page}/{word}")
-    public ResponseEntity search(@PathVariable int page, @PathVariable String word) {
-        Page<TrainerDto> pages = trainerService.searchTrainer(word, page, 8);
+    @GetMapping("/search/name/{page}/{word}")
+    public ResponseEntity searchByName(@PathVariable int page, @PathVariable String word) {
+        Page<TrainerDto> pages = trainerService.searchTrainerByName(word, page, 8);
         return ResponseEntity.ok(pages);
     }
+    @GetMapping("/search/date/{page}/{date}")
+    public ResponseEntity searchByDate(@PathVariable int page, @PathVariable String date) {
+
+        Page<TrainerDto> pages = trainerService.searchTrainerByDate(date, page, 8);
+        return ResponseEntity.ok(pages);
+    }
+
+
 
 
 }

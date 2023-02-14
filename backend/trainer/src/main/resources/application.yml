@@ -28,6 +28,7 @@ app:
     accessTokenExpirationMsec: 3600000 # 1시간
     authServerUrl : https://i8a803.p.ssafy.io/api/auth
     userServerUrl : https://i8a803.p.ssafy.io/api/user
+    businessServerUrl : https://i8a803.p.ssafy.io/api/business/reservation
   cors:
     allowedOrigins: http://localhost:3000,http://localhost:8002
 
