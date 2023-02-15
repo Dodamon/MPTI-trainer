@@ -8,6 +8,7 @@ import mpti.domain.trainer.api.request.SignUpRequest;
 import mpti.domain.trainer.api.request.StopRequest;
 import mpti.domain.trainer.api.request.UpdateRequest;
 import mpti.domain.trainer.api.request.UpdateStarRequest;
+import mpti.domain.trainer.api.response.ImageUrlResponse;
 import mpti.domain.trainer.dao.TrainerRepository;
 import mpti.domain.trainer.dto.IdDto;
 import mpti.domain.trainer.dto.TokenDto;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -266,5 +268,18 @@ public class TrainerService {
                         new ResourceNotFoundException("Trainer Id", userId)
                 );
         trainer.setStars(star);
+    }
+
+    @Transactional(readOnly = true)
+    public ImageUrlResponse getImageUrl(IdDto idDto) {
+        Long userId = idDto.getId();
+        Trainer trainer = trainerRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Trainer Id", userId)
+                );
+        String imageUrl = trainer.getImageUrl();
+        ImageUrlResponse imageUrlResponse = new ImageUrlResponse();
+        imageUrlResponse.setImageUrl(imageUrl);
+        return imageUrlResponse;
     }
 }
