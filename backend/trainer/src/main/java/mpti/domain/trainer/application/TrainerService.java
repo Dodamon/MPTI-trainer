@@ -7,6 +7,7 @@ import mpti.common.errors.ResourceNotFoundException;
 import mpti.domain.trainer.api.request.SignUpRequest;
 import mpti.domain.trainer.api.request.StopRequest;
 import mpti.domain.trainer.api.request.UpdateRequest;
+import mpti.domain.trainer.api.request.UpdateStarRequest;
 import mpti.domain.trainer.dao.TrainerRepository;
 import mpti.domain.trainer.dto.IdDto;
 import mpti.domain.trainer.dto.TokenDto;
@@ -253,5 +254,17 @@ public class TrainerService {
         Page<TrainerDto> Page = new PageImpl<>(trainerDtoList.subList(start,end), pageRequest, trainerDtoList.size());
 
         return Page;
+    }
+
+    @Transactional
+    public void updateStar(UpdateStarRequest updateStarRequest) {
+
+        Long userId = updateStarRequest.getId();
+        double star = updateStarRequest.getStar();
+        Trainer trainer = trainerRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Trainer Id", userId)
+                );
+        trainer.setStars(star);
     }
 }

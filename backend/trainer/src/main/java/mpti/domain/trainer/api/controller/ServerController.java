@@ -3,6 +3,7 @@ package mpti.domain.trainer.api.controller;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import mpti.domain.trainer.api.request.StopRequest;
+import mpti.domain.trainer.api.request.UpdateStarRequest;
 import mpti.domain.trainer.api.response.UserInfoResponse;
 import mpti.domain.trainer.application.TrainerService;
 import mpti.domain.trainer.dao.TrainerRepository;
@@ -45,4 +46,11 @@ public class ServerController {
         return ResponseEntity.ok(userInfoResponse);
     }
 
+//    [POST] trainer/update/star
+    @PostMapping("/update/star")
+    public ResponseEntity updateStar(@RequestBody String requestBody) {
+        UpdateStarRequest updateStarRequest = gson.fromJson(requestBody, UpdateStarRequest.class);
+        trainerService.updateStar(updateStarRequest);
+        return ResponseEntity.ok("update start success");
+    }
 }
