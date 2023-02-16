@@ -30,33 +30,6 @@ public class TrainerAuthService {
     @Value("${app.auth.businessServerUrl}")
     private String BUSINESS_SERVER_URL;
 
-
-//    public boolean isValidDB(String refreshToken) {
-//
-//        TokenDto tokenDto = new TokenDto();
-//        tokenDto.setRefreshToken(refreshToken);
-//        tokenDto.setState(false);
-//
-//        String json = gson.toJson(tokenDto);
-//
-//        RequestBody requestBody = RequestBody.create(MediaType.get("application/json; charset=utf-8"), json);
-//        Request request = new Request.Builder()
-//                .url(SERVER_URL + "/token")
-//                .post(requestBody)
-//                .build();
-//
-//        try (Response response = client.newCall(request).execute()) {
-//            if (response.isSuccessful()){
-//                String st = response.body().string();
-//                tokenDto = gson.fromJson(st, TokenDto.class);
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return tokenDto.getState();
-//    }
-
     public TokenDto getNewAccessToken(String refreshToken) {
 
         TokenDto tokenDto = new TokenDto();
@@ -92,7 +65,6 @@ public class TrainerAuthService {
         dayDto.setDay(Integer.parseInt(date.substring(6)));
 
         String json = gson.toJson(dayDto);
-        System.out.println(json);
 
         RequestBody requestBody = RequestBody.create(MediaType.get("application/json; charset=utf-8"), json);
         Request request = new Request.Builder()
@@ -105,7 +77,6 @@ public class TrainerAuthService {
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()){
                 String st = response.body().string();
-                System.out.println(st);
                 list = gson.fromJson(st, type);
             }
 

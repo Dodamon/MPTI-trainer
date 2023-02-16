@@ -7,13 +7,9 @@ import mpti.domain.trainer.api.request.UpdateStarRequest;
 import mpti.domain.trainer.api.response.ImageUrlResponse;
 import mpti.domain.trainer.api.response.UserInfoResponse;
 import mpti.domain.trainer.application.TrainerService;
-import mpti.domain.trainer.dao.TrainerRepository;
 import mpti.domain.trainer.dto.IdDto;
-import mpti.domain.trainer.entity.Trainer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/trainer")
@@ -22,11 +18,6 @@ public class ServerController {
     private final TrainerService trainerService;
 
     private final Gson gson;
-//    @PostMapping("/admin/stop")
-//    public ResponseEntity setStopUntil(@RequestBody StopRequest stopRequest) {
-//        trainerService.setStopUntil(stopRequest);
-//        return ResponseEntity.ok("stop trainer success");
-//    }
 
     @PostMapping("/admin/stop")
     public ResponseEntity setStopUntil(@RequestBody String requestBody) {
@@ -48,7 +39,6 @@ public class ServerController {
         return ResponseEntity.ok(userInfoResponse);
     }
 
-//    [POST] trainer/update/star
     @PostMapping("/update/star")
     public ResponseEntity updateStar(@RequestBody String requestBody) {
         UpdateStarRequest updateStarRequest = gson.fromJson(requestBody, UpdateStarRequest.class);

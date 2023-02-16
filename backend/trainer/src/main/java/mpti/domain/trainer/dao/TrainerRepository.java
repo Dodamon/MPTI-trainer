@@ -17,7 +17,6 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
     Optional<Trainer> findByEmail(String email);
     Boolean existsByEmail(String email);
     Trainer findTrainerByEmail(String email);
-    Slice<Trainer> findSliceByApproved(Boolean approved, PageRequest pageRequest);
     Page<Trainer> findPageByApproved(Boolean approved, PageRequest pageRequest);
     Page<Trainer> findPageByApprovedAndNameContaining(Boolean approved, String name, PageRequest pageRequest);
 }

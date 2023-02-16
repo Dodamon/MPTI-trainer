@@ -220,8 +220,6 @@ public class TrainerService {
 
     public Page<TrainerDto> searchTrainerByDate(String date, int page, int size) {
 
-        // 서버통신
-        System.out.println("서버통신");
         List<IdDto> trainerIdList = trainerAuthService.getTrainerIdList(date);
         List<TrainerDto> trainerDtoList = new ArrayList<>();
 
